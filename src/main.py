@@ -307,6 +307,9 @@ ser_port, ser_rate = 'usb', 115200
 serv_address, serv_port = "10.0.1.37", 7000
 client_address, client_port = "10.0.1.10", 9000
 
+# LED power supply on GPIO 4
+led_ps = 4
+
 my_device_channels = [
     ChannelData('blue', 1),
     ChannelData('red', 2),
@@ -320,6 +323,19 @@ print "\nOpen OSC BlinkenServe"
 print   "====================="
 print   "Author : Lee Szuba"
 print   "Date   : April 2015\n"
+
+try:
+    from RPi.GPIO as gpio
+    gpio.setmode(gpio.BCM)
+    gpio.setwarnings(False)
+    gpio.setup(gpio.OUT)
+except:
+    gpio = None
+
+if gpio is not None:
+    print "Detected Raspberry Pi\n"
+else:
+    print "Unable to open gpio, Raspberry Pi features disabled\n"
 
 try:
     ser_port = serial.serial_for_url("hwgrep://{}".format(ser_port)).port
@@ -405,6 +421,11 @@ except:
     print "Could not open port: {}".format(my_sender.port)
     print "Continuing in debug mode, packets will not be transmitted."
 
+if gpio is not None:
+    # Enable 12V LED power supply
+    gpio.output(led_ps, 1)
+
+
 # Start the serial communcation daemon in another thread
 t = threading.Thread(target=Sender.transmit, args=(my_sender, my_device,))
 t.daemon = True
@@ -419,6 +440,10 @@ try:
 
 except KeyboardInterrupt:
     print "\nClosing BlinkenServe."
+    if gpio is not None:
+        # Shut off the LED power supply
+        gpio.output(led_ps, 0)
+        gpio.cleanup()
     serv.close()
     print "Waiting for Server-thread to finish"
     serv_t.join()
