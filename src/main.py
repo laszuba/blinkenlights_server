@@ -325,7 +325,7 @@ print   "Author : Lee Szuba"
 print   "Date   : April 2015\n"
 
 try:
-    from RPi.GPIO as gpio
+    import RPi.GPIO as gpio
     gpio.setmode(gpio.BCM)
     gpio.setwarnings(False)
     gpio.setup(gpio.OUT)
