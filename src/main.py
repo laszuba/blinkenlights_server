@@ -5,7 +5,9 @@ import serial
 import sys
 import time
 import threading
+import re
 from math import *
+import subprocess
 
 class ChannelData:
     def __init__(self, name, address):
@@ -296,12 +298,29 @@ def set_beat_gate_callback(path, tags, args, source):
     update_channel(channel, beat_gate=enabled)
 
 def print_settings():
+    print ""
     print "Device Port     : {}".format(ser_port)
     print "Device Baud     : {}".format(ser_rate)
     print "OSC Server IP   : {}".format(serv_address)
     print "OSC Server Port : {}".format(serv_port)
     print "OSC Client IP   : {}".format(client_address)
     print "OSC Client Port : {}".format(client_port)
+    print ""
+
+def get_ip():
+    try:
+        console_output = subprocess.check_output(['ifconfig', 'eth0'])
+    except subprocess.CalledProcessError:
+        try:
+            console_output = subprocess.check_output(['ifconfig', 'en0'])
+        except:
+            return None
+
+    ip_pattern = re.compile(r"\sinet (\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b)")
+
+    ip = ip_pattern.findall(console_output)
+
+    return ip[0]
 
 ser_port, ser_rate = 'usb', 115200
 serv_address, serv_port = "10.0.1.37", 7000
@@ -332,10 +351,15 @@ try:
 except:
     gpio = None
 
+my_ip = get_ip()
+if my_ip is not None:
+    print "Found my ip: {}".format(my_ip)
+    serv_address = my_ip
+
 if gpio is not None:
-    print "Detected Raspberry Pi\n"
+    print "Detected Raspberry Pi"
 else:
-    print "Unable to open gpio, Raspberry Pi features disabled\n"
+    print "Unable to open gpio, Raspberry Pi features disabled"
 
 try:
     ser_port = serial.serial_for_url("hwgrep://{}".format(ser_port)).port
