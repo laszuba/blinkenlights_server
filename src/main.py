@@ -328,7 +328,7 @@ try:
     import RPi.GPIO as gpio
     gpio.setmode(gpio.BCM)
     gpio.setwarnings(False)
-    gpio.setup(gpio.OUT)
+    gpio.setup(led_ps, gpio.OUT)
 except:
     gpio = None
 
