@@ -314,7 +314,7 @@ def get_ip():
     except subprocess.CalledProcessError:
         pass
 
-    if console_output = None:
+    if console_output == None:
         try:
             console_output = subprocess.check_output(['ifconfig', 'en0'])
         except subprocess.CalledProcessError:
