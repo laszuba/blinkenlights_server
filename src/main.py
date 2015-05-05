@@ -320,7 +320,7 @@ def get_ip():
         except subprocess.CalledProcessError:
             return None
 
-    ip_pattern = re.compile(r"\sinet (\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b)")
+    ip_pattern = re.compile(r"\sinet (?:addr:)?(\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b)")
 
     ip = ip_pattern.findall(console_output)
 
