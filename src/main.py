@@ -308,12 +308,16 @@ def print_settings():
     print ""
 
 def get_ip():
+    console_output = None
     try:
         console_output = subprocess.check_output(['ifconfig', 'eth0'])
     except subprocess.CalledProcessError:
+        pass
+
+    if console_output = None:
         try:
             console_output = subprocess.check_output(['ifconfig', 'en0'])
-        except:
+        except subprocess.CalledProcessError:
             return None
 
     ip_pattern = re.compile(r"\sinet (\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b)")
@@ -432,11 +436,6 @@ for colour in ['r','g','b']:
 
 serv.addMsgHandler("/1/hue_sat", set_xyz_callback)
 serv.addMsgHandler("/1/value", set_xyz_callback)
-
-#my_message = OSCMessage("/1/set_r")
-#my_message.append(0.5)
-
-#client.send(my_message)
 
 try:
     my_sender.connect()
